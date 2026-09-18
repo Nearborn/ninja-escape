@@ -2,26 +2,128 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#111827" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0d1117" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>3D PWA Game</title>
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <title>Ninja Escape</title>
   </head>
   <body>
     <div id="game"></div>
-    <div id="hud">
-      <div class="title">3D PWA Game Starter</div>
-      <div class="help">WASD / arrows · mobile D-pad</div>
-      <button id="installButton" hidden>Install game</button>
+
+    <div id="startScreen" class="screen-overlay visible">
+      <div class="panel start-panel">
+        <div class="eyebrow">A VOXEL ESCAPE ADVENTURE</div>
+        <h1>NINJA<br><span>ESCAPE</span></h1>
+        <p class="story">You are ten years old. Ninjas have captured you and locked you inside their testing dungeon. Six escape rooms, five mazes, hidden prisoners, strange shadows and one enormous vault stand between you and freedom.</p>
+        <div class="start-actions">
+          <button id="continueButton" class="primary big" hidden>Continue Escape</button>
+          <button id="newGameButton" class="primary big">Start New Game</button>
+          <button id="installButton" class="secondary" hidden>Install Game</button>
+        </div>
+        <div class="controls-card">
+          <b>Desktop:</b> WASD / arrows move · mouse looks · Space jumps · E interacts · C opens bag<br>
+          <b>Tablet:</b> left joystick moves · drag the right side to look · ACTION / JUMP buttons
+        </div>
+      </div>
     </div>
 
-    <div id="touchControls" aria-label="Touch controls">
-      <button data-key="ArrowUp" class="up">▲</button>
-      <button data-key="ArrowLeft" class="left">◀</button>
-      <button data-key="ArrowDown" class="down">▼</button>
-      <button data-key="ArrowRight" class="right">▶</button>
+    <div id="hud" class="hidden-ui">
+      <div id="topLeftHud" class="hud-panel">
+        <div id="stageTitle">Dungeon Escape Room</div>
+        <div id="objective">Find a way out.</div>
+      </div>
+
+      <div id="topRightHud" class="hud-panel compact">
+        <div class="hud-row"><span>HUNGER</span><div class="meter"><div id="hungerFill"></div></div><span id="hungerText">100</span></div>
+        <div class="hud-row fragments"><span>CODE</span><span id="fragmentDisplay">? ? ? ? ?</span></div>
+      </div>
+
+      <div id="crosshair">+</div>
+      <div id="interactionPrompt"></div>
+      <div id="toastContainer"></div>
+
+      <button id="bagButton" class="round-ui" aria-label="Open bag">🎒</button>
+      <button id="pauseButton" class="round-ui" aria-label="Pause">Ⅱ</button>
+
+      <div id="touchUi">
+        <div id="movePad" aria-label="Movement joystick"><div id="moveThumb"></div></div>
+        <div id="lookHint">DRAG TO LOOK</div>
+        <div id="actionCluster">
+          <button id="jumpButton" class="touch-action jump">JUMP</button>
+          <button id="actionButton" class="touch-action action">ACTION</button>
+        </div>
+      </div>
     </div>
+
+    <div id="stageCard" class="stage-card hidden-ui">
+      <div id="stageNumber"></div>
+      <h2 id="stageCardTitle"></h2>
+      <p id="stageCardSubtitle"></p>
+    </div>
+
+    <div id="bagPanel" class="screen-overlay hidden-ui">
+      <div class="panel bag-panel">
+        <div class="panel-header"><h2>Backpack</h2><button class="close-x" data-close="bag">×</button></div>
+        <div class="bag-grid">
+          <section>
+            <h3>Inventory</h3>
+            <div id="inventoryList" class="inventory-list"></div>
+            <button id="eatButton" class="primary">Eat Food</button>
+          </section>
+          <section>
+            <h3>Crafting</h3>
+            <div id="recipeList" class="recipe-list"></div>
+          </section>
+        </div>
+        <div class="bag-tip">Tools are useful for secret caches and shortcuts. You never need to throw away an item.</div>
+      </div>
+    </div>
+
+    <div id="pausePanel" class="screen-overlay hidden-ui">
+      <div class="panel small-panel">
+        <h2>Paused</h2>
+        <button id="resumeButton" class="primary big">Continue</button>
+        <button id="restartStageButton" class="secondary">Restart this room</button>
+        <button id="resetSaveButton" class="danger">Erase save & restart</button>
+      </div>
+    </div>
+
+    <div id="miniGameModal" class="screen-overlay hidden-ui">
+      <div class="panel minigame-panel">
+        <div class="panel-header">
+          <div><div class="eyebrow">NINJA TEST</div><h2 id="miniGameTitle">Mini-game</h2></div>
+          <button id="miniGameClose" class="close-x">×</button>
+        </div>
+        <p id="miniGameInstructions"></p>
+        <div id="miniGameContent"></div>
+        <div id="miniGameStatus"></div>
+      </div>
+    </div>
+
+    <div id="keypadModal" class="screen-overlay hidden-ui">
+      <div class="panel keypad-panel">
+        <div class="eyebrow">FINAL VAULT</div>
+        <h2>Enter the five code fragments</h2>
+        <div id="keypadDisplay">_ _ _ _ _</div>
+        <div id="keypadGrid"></div>
+        <button id="keypadClear" class="secondary">Clear</button>
+        <button id="keypadClose" class="secondary">Back</button>
+      </div>
+    </div>
+
+    <div id="victoryScreen" class="screen-overlay hidden-ui">
+      <div class="panel victory-panel">
+        <div class="victory-stars">★ ★ ★</div>
+        <h1>YOU ESCAPED!</h1>
+        <p>You solved the ninjas' tests, rescued the trapped explorers, collected every code fragment and cracked the vault.</p>
+        <div id="victoryStats"></div>
+        <button id="playAgainButton" class="primary big">Escape Again</button>
+      </div>
+    </div>
+
+    <div id="rotateNotice">Rotate your tablet sideways for the best escape.</div>
 
     <script type="module" src="/src/main.js"></script>
   </body>
